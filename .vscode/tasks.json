@@ -1,0 +1,109 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Plugin: Link checkout",
+      "type": "shell",
+      "command": "target='${env:HOME}/.config/omarchy/plugins/joecastro.lastpass'; if [ -e \"$target\" ] && [ ! -L \"$target\" ]; then echo \"Refusing to replace existing directory: $target\" >&2; exit 1; fi; ln -sfn '${workspaceFolder}' \"$target\"; omarchy plugin enable joecastro.lastpass right",
+      "problemMatcher": []
+    },
+    {
+      "label": "Plugin: Select browser",
+      "type": "shell",
+      "command": "choices=$(python3 -c 'import sys; sys.path.insert(0, \"scripts\"); from lastpass_popup import LastPassPopup; popup = LastPassPopup(); print(\"\\n\".join(browser for browser in (\"chromium\", \"chrome\", \"brave\", \"edge\") if popup.discover(browser)))'); selected=$(printf 'auto\\n%s\\n' \"$choices\" | gum choose --header 'LastPass extension browser'); if [ -n \"$selected\" ]; then omarchy bar set joecastro.lastpass browser \"$selected\"; fi",
+      "problemMatcher": []
+    },
+    {
+      "label": "Validate: Sync environment",
+      "type": "process",
+      "command": "uv",
+      "args": ["sync", "--locked"],
+      "options": {
+        "env": {
+          "UV_PROJECT_ENVIRONMENT": "${env:HOME}/.cache/omarchy-lastpass-plugin/venv"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Validate: Python lint",
+      "type": "process",
+      "command": "uv",
+      "args": ["run", "--locked", "ruff", "check", "scripts/lastpass-popup", "scripts/lastpass_popup.py", "tests"],
+      "options": {
+        "env": {
+          "UV_PROJECT_ENVIRONMENT": "${env:HOME}/.cache/omarchy-lastpass-plugin/venv"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Validate: Python format",
+      "type": "process",
+      "command": "uv",
+      "args": ["run", "--locked", "ruff", "format", "--check", "scripts/lastpass-popup", "scripts/lastpass_popup.py", "tests"],
+      "options": {
+        "env": {
+          "UV_PROJECT_ENVIRONMENT": "${env:HOME}/.cache/omarchy-lastpass-plugin/venv"
+        }
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Validate: Python types",
+      "type": "process",
+      "command": "uv",
+      "args": ["run", "--locked", "mypy"],
+      "options": {
+        "env": {
+          "UV_PROJECT_ENVIRONMENT": "${env:HOME}/.cache/omarchy-lastpass-plugin/venv"
+        }
+      },
+      "problemMatcher": ["$msCompile"]
+    },
+    {
+      "label": "Validate: QML",
+      "type": "process",
+      "command": "/usr/lib/qt6/bin/qmllint",
+      "args": ["BarWidget.qml"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Validate: Manifest",
+      "type": "process",
+      "command": "omarchy",
+      "args": ["plugin", "validate", "."],
+      "problemMatcher": []
+    },
+    {
+      "label": "Validate: Tests",
+      "type": "process",
+      "command": "uv",
+      "args": ["run", "--locked", "pytest"],
+      "options": {
+        "env": {
+          "UV_PROJECT_ENVIRONMENT": "${env:HOME}/.cache/omarchy-lastpass-plugin/venv"
+        }
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Validate: All (CI equivalent)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Validate: Sync environment",
+        "Validate: Python lint",
+        "Validate: Python format",
+        "Validate: Python types",
+        "Validate: QML",
+        "Validate: Manifest",
+        "Validate: Tests"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

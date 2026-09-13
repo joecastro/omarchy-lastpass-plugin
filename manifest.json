@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "id": "joecastro.lastpass",
+  "name": "LastPass Quick Access for Omarchy",
+  "version": "0.1.0",
+  "author": "Joe Castro",
+  "license": "MIT",
+  "description": "Open the installed LastPass browser-extension menu from the Omarchy bar",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "LastPass Quick Access",
+    "description": "Toggle the LastPass extension menu or open the full web vault",
+    "category": "Security",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": {
+      "browser": "auto",
+      "popupWidth": 420,
+      "popupHeight": 650
+    },
+    "schema": [
+      {
+        "key": "browser",
+        "type": "enum",
+        "label": "Browser",
+        "options": ["auto", "chromium", "chrome", "brave", "edge"],
+        "defaultValue": "auto"
+      },
+      {
+        "key": "popupWidth",
+        "type": "integer",
+        "label": "Popup width",
+        "min": 280,
+        "max": 1200,
+        "step": 10,
+        "defaultValue": 420
+      },
+      {
+        "key": "popupHeight",
+        "type": "integer",
+        "label": "Popup height",
+        "min": 320,
+        "max": 1400,
+        "step": 10,
+        "defaultValue": 650
+      }
+    ]
+  }
+}

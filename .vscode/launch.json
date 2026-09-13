@@ -1,0 +1,50 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "LastPass: Toggle popup",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/lastpass-popup",
+      "args": ["toggle", "${input:browser}"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "LastPass: Open popup",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/lastpass-popup",
+      "args": ["open", "${input:browser}"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "LastPass: Open vault",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/lastpass-popup",
+      "args": ["vault", "${input:browser}"],
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Tests: Current file",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["${relativeFile}"],
+      "console": "integratedTerminal",
+      "justMyCode": false
+    }
+  ],
+  "inputs": [
+    {
+      "id": "browser",
+      "type": "pickString",
+      "description": "Browser hosting the LastPass extension",
+      "default": "auto",
+      "options": ["auto", "chromium", "chrome", "brave", "edge"]
+    }
+  ]
+}

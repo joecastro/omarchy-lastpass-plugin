@@ -1,0 +1,43 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    env:
+      UV_PROJECT_ENVIRONMENT: /tmp/omarchy-lastpass-venv
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
+        with:
+          version: "latest-known"
+      - name: Install development dependencies
+        run: uv sync --locked
+      - name: Install Qt lint tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes qt6-declarative-dev-tools
+      - name: Lint and format-check Python
+        run: |
+          uv run --locked ruff check scripts/lastpass-popup scripts/lastpass_popup.py tests
+          uv run --locked ruff format --check scripts/lastpass-popup scripts/lastpass_popup.py tests
+      - name: Type-check Python
+        run: uv run --locked mypy
+      - name: Parse QML
+        # Omarchy and Quickshell types are unavailable on this runner.
+        run: /usr/lib/qt6/bin/qmlformat BarWidget.qml > /dev/null
+      - name: Run the Omarchy plugin validator
+        run: |
+          curl --fail --silent --show-error --location \
+            https://raw.githubusercontent.com/basecamp/omarchy/b679363bed05415771a1b1dc92c6899a908236f7/bin/omarchy-plugin-validate \
+            --output /tmp/omarchy-plugin-validate
+          bash /tmp/omarchy-plugin-validate .
+      - name: Run regression tests
+        run: uv run --locked pytest
